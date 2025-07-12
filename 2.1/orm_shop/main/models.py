@@ -12,42 +12,56 @@ class Client(models.Model):
         return f'{self.name} {self.middle_name} {self.last_name}'
 
 
-GEARBOX_CHOICES = (
-    ('manual', 'Механика'),
-    ('automatic', 'Автомат'),
-    ('вариатор', 'CVT'),
-    ('robot', 'Робот')
-)
+BODY_TYPE_CHOICES = [
+    ('sedan', 'Седан'),
+    ('suv', 'Внедорожник'),
+    ('hatchback', 'Хэтчбек'),
+    ('wagon', 'Универсал'),
+    ('coupe', 'Купе'),
+    ('cabriolet', 'Кабриолет'),
+]
 
-FUEL_TYPE_CHOICES = (
-    ('gasoline', 'Бензин'),
+DRIVE_UNIT_CHOICES = [
+    ('fwd', 'Передний'),
+    ('rwd', 'Задний'),
+    ('awd', 'Полный'),
+]
+
+GEARBOX_CHOICES = [
+    ('manual', 'Механика'),
+    ('auto', 'Автомат'),
+    ('cvt', 'Вариатор'),
+]
+
+FUEL_TYPE_CHOICES = [
+    ('petrol', 'Бензин'),
     ('diesel', 'Дизель'),
     ('hybrid', 'Гибрид'),
-    ('electro', 'Электро')
-)
-
-BODY_TYPE_CHOICES = (
-    ('sedan', 'Седан'),
-    ('hatchback', 'Хэтчбек'),
-    ('SUV', 'Внедорожник'),
-    ('wagon', 'Универсал'),
-    ('minivan', 'Минивэн'),
-    ('pickup', 'Пикап'),
-    ('coupe', 'Купе'),
-    ('cabrio', 'Кабриолет')
-)
-
-
-DRIVE_UNIT_CHOICES = (
-    ('rear', 'Задний'),
-    ('front', 'Передний'),
-    ('full', 'Полный')
-)
+    ('electric', 'Электро'),
+]
 
 
 class Car(models.Model):
-    pass  # реализуйте модель
+    model = models.CharField(max_length=100)
+    year = models.PositiveIntegerField()
+    color = models.CharField(max_length=50)
+    mileage = models.PositiveIntegerField()
+    volume = models.DecimalField(max_digits=3, decimal_places=1)
+    body_type = models.CharField(max_length=20, choices=BODY_TYPE_CHOICES)
+    drive_unit = models.CharField(max_length=10, choices=DRIVE_UNIT_CHOICES)
+    gearbox = models.CharField(max_length=10, choices=GEARBOX_CHOICES)
+    fuel_type = models.CharField(max_length=10, choices=FUEL_TYPE_CHOICES)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to='cars/')
+
+    def __str__(self):
+        return f"{self.model} ({self.year})"
 
 
 class Sale(models.Model):
-    pass  # реализуйте модель
+    client = models.ForeignKey('Client', on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Продажа {self.car} клиенту {self.client} от {self.created_at}"
